@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.ServiceModel;
+using System.ServiceModel.Channels;
+using System.Threading.Tasks;
 
 namespace GettingStartedClient
 {
@@ -10,9 +12,8 @@ namespace GettingStartedClient
         private static readonly ChannelFactory<T> ChannelFactory;
         static ServiceClient()
         {
-            WSHttpBinding wSHttpBinding = new WSHttpBinding();
-            EndpointAddress myEndpoint = new EndpointAddress(ServiceEndpoint.GetEndPointOfService<T>());
-            ChannelFactory = new ChannelFactory<T>(wSHttpBinding, myEndpoint);
+            var access = ServiceEndpoint.GetEndPointOfService<T>();
+            ChannelFactory = new ChannelFactory<T>(access.Binding, access.EndPoint);
         }
 
         public static T GetService()
@@ -42,26 +43,75 @@ namespace GettingStartedClient
             }
             return result;
         }
+
+        public static async Task<TResult> ExecuteAsync<TResult>(Func<T, Task<TResult>> action)
+        {
+            IClientChannel clientChannel = (IClientChannel)ChannelFactory.CreateChannel();
+
+            bool success = false;
+            TaskCompletionSource<TResult> taskCompletionSource = new TaskCompletionSource<TResult>();
+            try
+            {
+                taskCompletionSource.TrySetResult(await action((T)clientChannel));
+                clientChannel.Close();
+                success = true;
+            }
+            catch (Exception ex)
+            {
+                taskCompletionSource.TrySetException(ex);
+            }
+            finally
+            {
+                if (!success)
+                {
+                    clientChannel.Abort();
+                }
+            }
+            return await taskCompletionSource.Task;
+        }
+
     }
 
 
     public static class ServiceEndpoint
     {
-        private static readonly Dictionary<Type, string> _mappingEndpoint = new Dictionary<Type, string>();
-
+        private static readonly Dictionary<Type, ChannelAccess> _mappingEndpoint = new Dictionary<Type, ChannelAccess>();
 
         static ServiceEndpoint()
         {
-            _mappingEndpoint.Add(typeof(ICalculatorService), 
-            "http://localhost:8733/Design_Time_Addresses/GettingStartedLib/CalculatorService/CalculatorService");
+            _mappingEndpoint.Add(typeof(ICalculatorService),
+                new ChannelAccess()
+                {
+                    EndPoint =
+                "http://localhost:8733/Design_Time_Addresses/GettingStartedLib/CalculatorService/CalculatorService",
+                    Binding = new WSHttpBinding()
+                }
+                );
+
+            _mappingEndpoint.Add(typeof(IWeatherService), 
+                new ChannelAccess()
+                {
+                    EndPoint = "http://localhost:59451/WorldWeatherService.svc",
+                    Binding = new BasicHttpBinding()
+                }
+                    );
         }
 
-        public static string GetEndPointOfService<T>()
+        public static ChannelAccess GetEndPointOfService<T>()
         {
-            if (_mappingEndpoint.TryGetValue(typeof(T), out string endPoint))
-                return endPoint;
+            if (_mappingEndpoint.TryGetValue(typeof(T), out ChannelAccess channelAccess))
+                return channelAccess;
 
-            return string.Empty;
+            return new ChannelAccess() { Binding = new BasicHttpBinding()};
         }
+       
+    }
+
+
+    public class ChannelAccess
+    {
+        public string EndPoint { get; set; }
+
+        public Binding Binding { get; set; }
     }
 }

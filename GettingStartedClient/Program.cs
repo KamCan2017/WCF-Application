@@ -1,5 +1,6 @@
 ﻿using Domain.Services;
 using System;
+using System.Threading.Tasks;
 
 namespace GettingStartedClient
 {
@@ -7,6 +8,7 @@ namespace GettingStartedClient
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("-----CalculatorService-----");
 
             //var client = ProxyCreator.GetInstance<ServiceReference1.ICalculatorService>();
             //var value = client.Add(1, 2);
@@ -44,6 +46,15 @@ namespace GettingStartedClient
             result = ServiceClient<ICalculatorService>.Execute(o => o.Divide(value1, value2));
             //client.Divide(value1, value2);
             Console.WriteLine("Divide({0};{1}) = {2}", value1, value2, result);
+
+
+            Console.WriteLine("-----WeatherService-----");         
+
+            var weather = ServiceClient<IWeatherService>.Execute(o => o.GetTemperature("Paris"));
+            Console.WriteLine(weather);
+
+            weather = ServiceClient<IWeatherService>.Execute(o => o.GetTemperature("Yaounde"));
+            Console.WriteLine(weather);
 
             Console.ReadLine();
 
