@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Autofac, Version=4.8.1.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.4.8.1\lib\net45\Autofac.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
@@ -51,6 +54,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ProxyCreator.cs" />
     <Compile Include="ServiceClient.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -63,14 +67,15 @@
     <None Include="Connected Services\ServiceReference1\item1.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GetttingStartedLib\GettingStartedLib.csproj">
-      <Project>{87191bbb-aa45-481c-9746-2da4e2b49d1d}</Project>
-      <Name>GettingStartedLib</Name>
+    <ProjectReference Include="..\Domain.Services\Domain.Services.csproj">
+      <Project>{C43F38CC-BCB0-4868-96A9-26B0A705974A}</Project>
+      <Name>Domain.Services</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

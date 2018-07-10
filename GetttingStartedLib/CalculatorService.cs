@@ -1,4 +1,5 @@
 ﻿// Service1.cs  
+using Domain.Services;
 using System;
 
 namespace GettingStartedLib

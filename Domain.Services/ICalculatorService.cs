@@ -1,7 +1,7 @@
 ﻿// IService.cs  
 using System.ServiceModel;
 
-namespace GettingStartedLib
+namespace Domain.Services
 {
     [ServiceContract(Namespace = "http://Microsoft.ServiceModel.Samples")]
     public interface ICalculatorService

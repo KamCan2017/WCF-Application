@@ -1,4 +1,5 @@
 ﻿// program.cs  
+using Domain.Services;
 using GettingStartedLib;
 using System;
 using System.ServiceModel;

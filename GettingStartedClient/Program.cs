@@ -1,4 +1,4 @@
-﻿using GettingStartedLib;
+﻿using Domain.Services;
 using System;
 
 namespace GettingStartedClient
@@ -7,6 +7,10 @@ namespace GettingStartedClient
     {
         static void Main(string[] args)
         {
+
+            //var client = ProxyCreator.GetInstance<ServiceReference1.ICalculatorService>();
+            //var value = client.Add(1, 2);
+
             var svc = ServiceClient<ICalculatorService>.GetService();
             var res = svc.Add(1, 2);
             //Step 1: Create an instance of the WCF proxy.  

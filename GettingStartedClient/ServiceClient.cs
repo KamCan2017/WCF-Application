@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Domain.Services;
+using System;
+using System.Collections.Generic;
 using System.ServiceModel;
 
 namespace GettingStartedClient
@@ -6,12 +8,10 @@ namespace GettingStartedClient
     public static class ServiceClient<T> 
     {
         private static readonly ChannelFactory<T> ChannelFactory;
-
-        private static readonly string EndpointAddress = "http://localhost:8733/Design_Time_Addresses/GettingStartedLib/CalculatorService/CalculatorService";
         static ServiceClient()
         {
             WSHttpBinding wSHttpBinding = new WSHttpBinding();
-            EndpointAddress myEndpoint = new EndpointAddress(EndpointAddress);
+            EndpointAddress myEndpoint = new EndpointAddress(ServiceEndpoint.GetEndPointOfService<T>());
             ChannelFactory = new ChannelFactory<T>(wSHttpBinding, myEndpoint);
         }
 
@@ -41,6 +41,27 @@ namespace GettingStartedClient
                 }
             }
             return result;
+        }
+    }
+
+
+    public static class ServiceEndpoint
+    {
+        private static readonly Dictionary<Type, string> _mappingEndpoint = new Dictionary<Type, string>();
+
+
+        static ServiceEndpoint()
+        {
+            _mappingEndpoint.Add(typeof(ICalculatorService), 
+            "http://localhost:8733/Design_Time_Addresses/GettingStartedLib/CalculatorService/CalculatorService");
+        }
+
+        public static string GetEndPointOfService<T>()
+        {
+            if (_mappingEndpoint.TryGetValue(typeof(T), out string endPoint))
+                return endPoint;
+
+            return string.Empty;
         }
     }
 }
